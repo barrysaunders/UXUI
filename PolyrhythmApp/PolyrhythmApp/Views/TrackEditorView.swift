@@ -2,11 +2,16 @@ import SwiftUI
 
 /// Detailed editor for a single track's parameters including synth controls,
 /// step editor, and per-step velocity/note editing.
+/// On iPad, content is constrained to a comfortable max width.
 struct TrackEditorView: View {
     @ObservedObject var viewModel: SessionViewModel
     let trackIndex: Int
 
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+
     @State private var selectedTab = 0
+
+    private var isWide: Bool { horizontalSizeClass == .regular }
 
     private var track: Track {
         guard trackIndex < viewModel.tracks.count else {
@@ -17,23 +22,23 @@ struct TrackEditorView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header
             header
-
-            // Tab selector
             tabBar
 
-            // Content
             ScrollView {
-                switch selectedTab {
-                case 0: patternEditor
-                case 1: synthControls
-                case 2: evolutionControls
-                default: patternEditor
+                VStack {
+                    switch selectedTab {
+                    case 0: patternEditor
+                    case 1: synthControls
+                    case 2: evolutionControls
+                    default: patternEditor
+                    }
                 }
+                .frame(maxWidth: isWide ? 700 : .infinity)
+                .frame(maxWidth: .infinity) // center within scroll
+                .padding(.horizontal, isWide ? 32 : 16)
+                .padding(.top, 12)
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 12)
         }
         .background(Color.black)
     }
@@ -43,15 +48,15 @@ struct TrackEditorView: View {
     private var header: some View {
         HStack {
             Image(systemName: track.voiceType.icon)
+                .font(.system(size: isWide ? 18 : 14))
                 .foregroundColor(track.voiceType.color)
 
             Text(track.name)
-                .font(.system(size: 16, weight: .bold, design: .monospaced))
+                .font(.system(size: isWide ? 20 : 16, weight: .bold, design: .monospaced))
                 .foregroundColor(track.voiceType.color)
 
             Spacer()
 
-            // Voice type picker
             Menu {
                 ForEach(VoiceType.allCases) { voice in
                     Button(voice.rawValue) {
@@ -63,18 +68,18 @@ struct TrackEditorView: View {
                 }
             } label: {
                 Image(systemName: "waveform.badge.plus")
-                    .font(.system(size: 14))
+                    .font(.system(size: isWide ? 16 : 14))
                     .foregroundColor(.white.opacity(0.6))
             }
 
             Button(action: { viewModel.showTrackEditor = false }) {
                 Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 18))
+                    .font(.system(size: isWide ? 22 : 18))
                     .foregroundColor(.white.opacity(0.4))
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.horizontal, isWide ? 24 : 16)
+        .padding(.vertical, isWide ? 16 : 12)
         .background(track.voiceType.color.opacity(0.1))
     }
 
@@ -92,10 +97,10 @@ struct TrackEditorView: View {
     private func tabButton(_ title: String, index: Int) -> some View {
         Button(action: { selectedTab = index }) {
             Text(title)
-                .font(.system(size: 12, weight: selectedTab == index ? .bold : .regular, design: .monospaced))
+                .font(.system(size: isWide ? 14 : 12, weight: selectedTab == index ? .bold : .regular, design: .monospaced))
                 .foregroundColor(selectedTab == index ? track.voiceType.color : .gray)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
+                .padding(.vertical, isWide ? 14 : 10)
                 .background(selectedTab == index ? track.voiceType.color.opacity(0.1) : .clear)
         }
         .buttonStyle(.plain)
@@ -104,11 +109,11 @@ struct TrackEditorView: View {
     // MARK: - Pattern Editor
 
     private var patternEditor: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: isWide ? 20 : 16) {
             // Step count control
             HStack {
                 Text("Steps")
-                    .font(.system(size: 12, design: .monospaced))
+                    .font(.system(size: isWide ? 14 : 12, design: .monospaced))
                     .foregroundColor(.gray)
                 Spacer()
                 Button("-") {
@@ -116,40 +121,41 @@ struct TrackEditorView: View {
                         t.setStepCount(t.steps.count - 1)
                     }
                 }
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: isWide ? 20 : 16, weight: .bold))
                 .foregroundColor(.white)
 
                 Text("\(track.steps.count)")
-                    .font(.system(size: 16, weight: .bold, design: .monospaced))
+                    .font(.system(size: isWide ? 20 : 16, weight: .bold, design: .monospaced))
                     .foregroundColor(track.voiceType.color)
-                    .frame(width: 30)
+                    .frame(width: isWide ? 40 : 30)
 
                 Button("+") {
                     viewModel.updateTrack(at: trackIndex) { t in
                         t.setStepCount(t.steps.count + 1)
                     }
                 }
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: isWide ? 20 : 16, weight: .bold))
                 .foregroundColor(.white)
             }
 
             // Large step grid with velocity bars
-            VStack(spacing: 4) {
+            VStack(spacing: isWide ? 6 : 4) {
                 // Velocity bars
-                HStack(spacing: 2) {
+                let velBarHeight: CGFloat = isWide ? 60 : 40
+                HStack(spacing: isWide ? 3 : 2) {
                     ForEach(0..<track.steps.count, id: \.self) { i in
                         let step = track.steps[i]
                         VStack {
                             Spacer()
-                            RoundedRectangle(cornerRadius: 1)
+                            RoundedRectangle(cornerRadius: isWide ? 2 : 1)
                                 .fill(step.isActive ? track.voiceType.color.opacity(Double(step.velocity)) : Color.gray.opacity(0.1))
-                                .frame(height: CGFloat(step.velocity) * 40)
+                                .frame(height: CGFloat(step.velocity) * velBarHeight)
                         }
-                        .frame(height: 40)
+                        .frame(height: velBarHeight)
                         .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
-                                    let vel = 1.0 - Float(value.location.y / 40)
+                                    let vel = 1.0 - Float(value.location.y / velBarHeight)
                                     viewModel.updateTrack(at: trackIndex) { t in
                                         t.steps[i].velocity = max(0.1, min(1.0, vel))
                                     }
@@ -159,19 +165,19 @@ struct TrackEditorView: View {
                 }
 
                 // Step buttons
-                HStack(spacing: 2) {
+                HStack(spacing: isWide ? 3 : 2) {
                     ForEach(0..<track.steps.count, id: \.self) { i in
                         Button(action: {
                             viewModel.updateTrack(at: trackIndex) { t in
                                 t.steps[i].isActive.toggle()
                             }
                         }) {
-                            RoundedRectangle(cornerRadius: 3)
+                            RoundedRectangle(cornerRadius: isWide ? 4 : 3)
                                 .fill(track.steps[i].isActive ? track.voiceType.color : Color.white.opacity(0.05))
-                                .frame(height: 30)
+                                .frame(height: isWide ? 40 : 30)
                                 .overlay(
                                     Text("\(i + 1)")
-                                        .font(.system(size: 8, design: .monospaced))
+                                        .font(.system(size: isWide ? 10 : 8, design: .monospaced))
                                         .foregroundColor(track.steps[i].isActive ? .black.opacity(0.5) : .gray.opacity(0.3))
                                 )
                         }
@@ -182,26 +188,27 @@ struct TrackEditorView: View {
                 // Note lanes (for melodic voices)
                 if track.voiceType != .kick && track.voiceType != .snare &&
                    track.voiceType != .hihat && track.voiceType != .perc {
+                    let noteHeight: CGFloat = isWide ? 70 : 50
                     VStack(spacing: 2) {
                         Text("Notes")
-                            .font(.system(size: 10, design: .monospaced))
+                            .font(.system(size: isWide ? 12 : 10, design: .monospaced))
                             .foregroundColor(.gray)
                             .frame(maxWidth: .infinity, alignment: .leading)
 
-                        HStack(spacing: 2) {
+                        HStack(spacing: isWide ? 3 : 2) {
                             ForEach(0..<track.steps.count, id: \.self) { i in
                                 let step = track.steps[i]
                                 VStack {
                                     Spacer()
-                                    RoundedRectangle(cornerRadius: 1)
+                                    RoundedRectangle(cornerRadius: isWide ? 2 : 1)
                                         .fill(step.isActive ? track.voiceType.color.opacity(0.5) : Color.gray.opacity(0.1))
-                                        .frame(height: max(4, CGFloat(step.note) * 3))
+                                        .frame(height: max(4, CGFloat(step.note) * (isWide ? 4 : 3)))
                                 }
-                                .frame(height: 50)
+                                .frame(height: noteHeight)
                                 .gesture(
                                     DragGesture(minimumDistance: 0)
                                         .onChanged { value in
-                                            let note = Int((1.0 - value.location.y / 50) * 14)
+                                            let note = Int((1.0 - value.location.y / noteHeight) * 14)
                                             viewModel.updateTrack(at: trackIndex) { t in
                                                 t.steps[i].note = max(0, min(14, note))
                                             }
@@ -214,7 +221,7 @@ struct TrackEditorView: View {
             }
 
             // Quick actions
-            HStack(spacing: 8) {
+            HStack(spacing: isWide ? 12 : 8) {
                 quickActionButton("Random") {
                     viewModel.randomizeTrack(at: trackIndex)
                 }
@@ -239,7 +246,7 @@ struct TrackEditorView: View {
     // MARK: - Synth Controls
 
     private var synthControls: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: isWide ? 20 : 16) {
             paramSlider("Volume", value: track.volume) { v in
                 viewModel.updateTrack(at: trackIndex) { $0.volume = v }
             }
@@ -285,7 +292,7 @@ struct TrackEditorView: View {
             // Pitch offset
             HStack {
                 Text("Pitch")
-                    .font(.system(size: 11, design: .monospaced))
+                    .font(.system(size: isWide ? 13 : 11, design: .monospaced))
                     .foregroundColor(.gray)
                 Spacer()
                 Button("-") {
@@ -293,16 +300,15 @@ struct TrackEditorView: View {
                 }
                 .foregroundColor(.white)
                 Text("\(track.pitchOffset > 0 ? "+" : "")\(track.pitchOffset)")
-                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+                    .font(.system(size: isWide ? 16 : 13, weight: .bold, design: .monospaced))
                     .foregroundColor(track.voiceType.color)
-                    .frame(width: 40)
+                    .frame(width: isWide ? 50 : 40)
                 Button("+") {
                     viewModel.updateTrack(at: trackIndex) { $0.pitchOffset += 1 }
                 }
                 .foregroundColor(.white)
             }
 
-            // Randomize params button
             quickActionButton("Randomize Sound") {
                 EvolutionEngine.randomizeParameters(track: &viewModel.tracks[trackIndex])
             }
@@ -312,7 +318,7 @@ struct TrackEditorView: View {
     // MARK: - Evolution Controls
 
     private var evolutionControls: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: isWide ? 20 : 16) {
             paramSlider("Evolution Rate", value: track.evolutionRate) { v in
                 viewModel.updateTrack(at: trackIndex) { $0.evolutionRate = v }
             }
@@ -323,7 +329,7 @@ struct TrackEditorView: View {
 
             Divider().background(Color.gray.opacity(0.3))
 
-            HStack(spacing: 8) {
+            HStack(spacing: isWide ? 12 : 8) {
                 quickActionButton("Evolve Once") {
                     EvolutionEngine.evolve(track: &viewModel.tracks[trackIndex], scale: viewModel.scale)
                 }
@@ -334,7 +340,7 @@ struct TrackEditorView: View {
             }
 
             Text("Evolution gradually mutates the pattern while playing.\nHigher rate = more frequent changes.")
-                .font(.system(size: 10, design: .monospaced))
+                .font(.system(size: isWide ? 12 : 10, design: .monospaced))
                 .foregroundColor(.gray.opacity(0.5))
                 .multilineTextAlignment(.center)
         }
@@ -349,27 +355,29 @@ struct TrackEditorView: View {
     }
 
     private func paramSlider(_ name: String, value: Float, label: String? = nil, onChange: @escaping (Float) -> Void) -> some View {
-        VStack(spacing: 4) {
+        let sliderHeight: CGFloat = isWide ? 10 : 6
+        return VStack(spacing: 4) {
             HStack {
                 Text(name)
-                    .font(.system(size: 11, design: .monospaced))
+                    .font(.system(size: isWide ? 13 : 11, design: .monospaced))
                     .foregroundColor(.gray)
                 Spacer()
                 Text(label ?? "\(Int(value * 100))%")
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .font(.system(size: isWide ? 13 : 11, weight: .medium, design: .monospaced))
                     .foregroundColor(track.voiceType.color)
             }
 
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 2)
+                    RoundedRectangle(cornerRadius: sliderHeight / 3)
                         .fill(Color.white.opacity(0.05))
-                        .frame(height: 6)
+                        .frame(height: sliderHeight)
 
-                    RoundedRectangle(cornerRadius: 2)
+                    RoundedRectangle(cornerRadius: sliderHeight / 3)
                         .fill(track.voiceType.color.opacity(0.6))
-                        .frame(width: geo.size.width * CGFloat(value), height: 6)
+                        .frame(width: geo.size.width * CGFloat(value), height: sliderHeight)
                 }
+                .contentShape(Rectangle())
                 .gesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged { drag in
@@ -378,19 +386,19 @@ struct TrackEditorView: View {
                         }
                 )
             }
-            .frame(height: 6)
+            .frame(height: sliderHeight)
         }
     }
 
     private func quickActionButton(_ title: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .font(.system(size: isWide ? 13 : 11, weight: .medium, design: .monospaced))
                 .foregroundColor(track.voiceType.color)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
+                .padding(.vertical, isWide ? 12 : 8)
                 .background(
-                    RoundedRectangle(cornerRadius: 6)
+                    RoundedRectangle(cornerRadius: isWide ? 8 : 6)
                         .stroke(track.voiceType.color.opacity(0.3), lineWidth: 1)
                 )
         }
