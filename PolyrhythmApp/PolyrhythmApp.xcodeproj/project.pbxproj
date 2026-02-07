@@ -156,6 +156,10 @@
 				TargetAttributes = {
 					A60000010000000000000001 = {
 						CreatedOnToolsVersion = 15.0;
+						supportedDestinations = (
+							iPhone,
+							iPad,
+						);
 					};
 				};
 			};
