@@ -7,20 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A10000010000000000000001 /* PolyrhythmApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000001; };
-		A10000010000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000002; };
-		A10000010000000000000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000003; };
-		A10000010000000000000004 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000004; };
-		A10000010000000000000005 /* AudioEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000005; };
-		A10000010000000000000006 /* Synthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000006; };
-		A10000010000000000000007 /* Sequencer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000007; };
-		A10000010000000000000008 /* EvolutionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000008; };
-		A10000010000000000000009 /* SessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000009; };
-		A1000001000000000000000A /* PolyrhythmVisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000A; };
-		A1000001000000000000000B /* TrackRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000B; };
-		A1000001000000000000000C /* TrackEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000C; };
-		A1000001000000000000000D /* TransportBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000D; };
-		A1000001000000000000000E /* GlobalSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000E; };
+		A10000010000000000000001 /* PolyrhythmApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000001 /* PolyrhythmApp.swift */; };
+		A10000010000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000002 /* ContentView.swift */; };
+		A10000010000000000000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000003 /* Assets.xcassets */; };
+		A10000010000000000000004 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000004 /* Track.swift */; };
+		A10000010000000000000005 /* AudioEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000005 /* AudioEngine.swift */; };
+		A10000010000000000000006 /* Synthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000006 /* Synthesizer.swift */; };
+		A10000010000000000000007 /* Sequencer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000007 /* Sequencer.swift */; };
+		A10000010000000000000008 /* EvolutionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000008 /* EvolutionEngine.swift */; };
+		A10000010000000000000009 /* SessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010000000000000009 /* SessionViewModel.swift */; };
+		A1000001000000000000000A /* PolyrhythmVisualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000A /* PolyrhythmVisualizerView.swift */; };
+		A1000001000000000000000B /* TrackRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000B /* TrackRowView.swift */; };
+		A1000001000000000000000C /* TrackEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000C /* TrackEditorView.swift */; };
+		A1000001000000000000000D /* TransportBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000D /* TransportBarView.swift */; };
+		A1000001000000000000000E /* GlobalSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000E /* GlobalSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -149,7 +149,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					A60000010000000000000001 = {
 						CreatedOnToolsVersion = 15.0;
@@ -244,6 +244,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 59X44GB57Z;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -266,6 +267,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -306,6 +308,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 59X44GB57Z;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -321,6 +324,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -333,7 +337,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 59X44GB57Z;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Polyrhythm;
@@ -355,7 +359,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -366,7 +370,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 59X44GB57Z;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Polyrhythm;
@@ -388,7 +392,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -414,7 +418,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = AA0000010000000000000001 /* Project object */;
 }

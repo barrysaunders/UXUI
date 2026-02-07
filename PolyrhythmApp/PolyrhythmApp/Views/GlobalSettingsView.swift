@@ -136,11 +136,11 @@ struct GlobalSettingsView: View {
                         .font(.system(size: 12, design: .monospaced))
                         .foregroundColor(.gray)
                     Spacer()
-                    Text("\(Int(viewModel.audioEngine.masterVolume * 100))%")
+                    Text("\(Int(viewModel.masterVolume * 100))%")
                         .font(.system(size: 14, weight: .bold, design: .monospaced))
                         .foregroundColor(.purple)
                 }
-                Slider(value: $viewModel.audioEngine.masterVolume, in: 0...1)
+                Slider(value: $viewModel.masterVolume, in: 0...1)
                     .tint(.purple)
             }
 
@@ -150,11 +150,11 @@ struct GlobalSettingsView: View {
                         .font(.system(size: 12, design: .monospaced))
                         .foregroundColor(.gray)
                     Spacer()
-                    Text("\(Int(viewModel.audioEngine.reverbMix * 100))%")
+                    Text("\(Int(viewModel.reverbMix * 100))%")
                         .font(.system(size: 14, weight: .bold, design: .monospaced))
                         .foregroundColor(.purple)
                 }
-                Slider(value: $viewModel.audioEngine.reverbMix, in: 0...1)
+                Slider(value: $viewModel.reverbMix, in: 0...1)
                     .tint(.purple)
             }
 
@@ -164,11 +164,11 @@ struct GlobalSettingsView: View {
                         .font(.system(size: 12, design: .monospaced))
                         .foregroundColor(.gray)
                     Spacer()
-                    Text("\(Int(viewModel.audioEngine.delayMix * 100))%")
+                    Text("\(Int(viewModel.delayMix * 100))%")
                         .font(.system(size: 14, weight: .bold, design: .monospaced))
                         .foregroundColor(.purple)
                 }
-                Slider(value: $viewModel.audioEngine.delayMix, in: 0...1)
+                Slider(value: $viewModel.delayMix, in: 0...1)
                     .tint(.purple)
             }
         }

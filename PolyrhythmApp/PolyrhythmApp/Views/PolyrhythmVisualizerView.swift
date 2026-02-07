@@ -108,8 +108,8 @@ struct PolyrhythmVisualizerView: View {
 
     private func pointOnCircle(center: CGPoint, radius: CGFloat, angle: Double) -> CGPoint {
         CGPoint(
-            x: center.x + radius * cos(angle),
-            y: center.y + radius * sin(angle)
+            x: center.x + radius * cos(CGFloat(angle)),
+            y: center.y + radius * sin(CGFloat(angle))
         )
     }
 
