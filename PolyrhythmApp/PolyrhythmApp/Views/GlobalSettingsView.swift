@@ -99,20 +99,47 @@ struct GlobalSettingsView: View {
         VStack(alignment: .leading, spacing: isWide ? 16 : 12) {
             sectionHeader("Master Effects")
 
-            settingsSlider("Master Volume", value: Binding(
-                get: { Double(viewModel.audioEngine.masterVolume) },
-                set: { viewModel.audioEngine.masterVolume = Float($0) }
-            ), range: 0...1, step: 0.01, format: { "\(Int($0 * 100))%" }, tintColor: .purple)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text("Master Volume")
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundColor(.gray)
+                    Spacer()
+                    Text("\(Int(viewModel.masterVolume * 100))%")
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .foregroundColor(.purple)
+                }
+                Slider(value: $viewModel.masterVolume, in: 0...1)
+                    .tint(.purple)
+            }
 
-            settingsSlider("Reverb", value: Binding(
-                get: { Double(viewModel.audioEngine.reverbMix) },
-                set: { viewModel.audioEngine.reverbMix = Float($0) }
-            ), range: 0...1, step: 0.01, format: { "\(Int($0 * 100))%" }, tintColor: .purple)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text("Reverb")
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundColor(.gray)
+                    Spacer()
+                    Text("\(Int(viewModel.reverbMix * 100))%")
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .foregroundColor(.purple)
+                }
+                Slider(value: $viewModel.reverbMix, in: 0...1)
+                    .tint(.purple)
+            }
 
-            settingsSlider("Delay", value: Binding(
-                get: { Double(viewModel.audioEngine.delayMix) },
-                set: { viewModel.audioEngine.delayMix = Float($0) }
-            ), range: 0...1, step: 0.01, format: { "\(Int($0 * 100))%" }, tintColor: .purple)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text("Delay")
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundColor(.gray)
+                    Spacer()
+                    Text("\(Int(viewModel.delayMix * 100))%")
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .foregroundColor(.purple)
+                }
+                Slider(value: $viewModel.delayMix, in: 0...1)
+                    .tint(.purple)
+            }
         }
         .padding(isWide ? 20 : 16)
         .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.03)))

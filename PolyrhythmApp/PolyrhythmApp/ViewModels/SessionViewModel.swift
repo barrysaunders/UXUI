@@ -29,6 +29,17 @@ final class SessionViewModel: ObservableObject {
         didSet { sequencer.swingAmount = swingAmount }
     }
 
+    // Master effects (proxied to audioEngine)
+    @Published var masterVolume: Float = 0.8 {
+        didSet { audioEngine.masterVolume = masterVolume }
+    }
+    @Published var reverbMix: Float = 0.3 {
+        didSet { audioEngine.reverbMix = reverbMix }
+    }
+    @Published var delayMix: Float = 0.2 {
+        didSet { audioEngine.delayMix = delayMix }
+    }
+
     @Published var currentSteps: [UUID: Int] = [:]
     @Published var selectedTrackIndex: Int? = nil
     @Published var showTrackEditor = false
@@ -48,6 +59,11 @@ final class SessionViewModel: ObservableObject {
     }
 
     init() {
+        // Initialize audio engine values
+        masterVolume = audioEngine.masterVolume
+        reverbMix = audioEngine.reverbMix
+        delayMix = audioEngine.delayMix
+        
         setupSequencerCallbacks()
         loadDefaultSession()
     }
@@ -224,8 +240,8 @@ final class SessionViewModel: ObservableObject {
     func savePreset(name: String) {
         var preset = Preset(name: name, bpm: bpm, scale: scale, rootNote: rootNote)
         preset.tracks = tracks
-        preset.masterReverb = audioEngine.reverbMix
-        preset.masterDelay = audioEngine.delayMix
+        preset.masterReverb = reverbMix
+        preset.masterDelay = delayMix
         preset.swingAmount = swingAmount
 
         if let idx = presets.firstIndex(where: { $0.name == name }) {
@@ -254,8 +270,8 @@ final class SessionViewModel: ObservableObject {
         scale = preset.scale
         rootNote = preset.rootNote
         swingAmount = preset.swingAmount
-        audioEngine.reverbMix = preset.masterReverb
-        audioEngine.delayMix = preset.masterDelay
+        reverbMix = preset.masterReverb
+        delayMix = preset.masterDelay
 
         // Recreate tracks
         for var track in preset.tracks {
