@@ -1,8 +1,11 @@
 import SwiftUI
 
 /// Main content view with polyrhythm visualizer, track list, and transport controls.
+/// Adapts layout for iPhone (stacked) and iPad (side-by-side in landscape).
 struct ContentView: View {
     @StateObject private var viewModel = SessionViewModel()
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.verticalSizeClass) var verticalSizeClass
 
     @State private var viewMode: ViewMode = .hybrid
 
@@ -12,26 +15,24 @@ struct ContentView: View {
         case hybrid = "Hybrid"
     }
 
+    /// True when we have enough width for side-by-side (iPad landscape, or any regular width)
+    private var isWideLayout: Bool {
+        horizontalSizeClass == .regular
+    }
+
     var body: some View {
         ZStack {
-            // Background
             Color.black.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Top bar
                 topBar
 
-                // Main content
-                switch viewMode {
-                case .visualizer:
-                    visualizerOnly
-                case .tracks:
-                    trackListOnly
-                case .hybrid:
-                    hybridView
+                if isWideLayout {
+                    iPadLayout
+                } else {
+                    iPhoneLayout
                 }
 
-                // Transport
                 TransportBarView(viewModel: viewModel)
             }
         }
@@ -39,10 +40,46 @@ struct ContentView: View {
         .sheet(isPresented: $viewModel.showTrackEditor) {
             if let idx = viewModel.selectedTrackIndex {
                 TrackEditorView(viewModel: viewModel, trackIndex: idx)
-                    .presentationDetents([.medium, .large])
+                    .presentationDetents(isWideLayout ? [.large] : [.medium, .large])
                     .presentationDragIndicator(.visible)
                     .preferredColorScheme(.dark)
             }
+        }
+    }
+
+    // MARK: - iPhone Layout (stacked, as before)
+
+    private var iPhoneLayout: some View {
+        Group {
+            switch viewMode {
+            case .visualizer:
+                visualizerView
+            case .tracks:
+                trackList
+            case .hybrid:
+                VStack(spacing: 0) {
+                    visualizerView
+                        .frame(height: 250)
+                    Divider().background(Color.gray.opacity(0.2))
+                    trackList
+                }
+            }
+        }
+    }
+
+    // MARK: - iPad Layout (side-by-side)
+
+    private var iPadLayout: some View {
+        HStack(spacing: 0) {
+            // Left: Visualizer (always visible on iPad)
+            visualizerView
+                .frame(minWidth: 300)
+
+            Divider().background(Color.gray.opacity(0.2))
+
+            // Right: Track list
+            trackList
+                .frame(minWidth: 320, idealWidth: 420, maxWidth: 600)
         }
     }
 
@@ -52,44 +89,46 @@ struct ContentView: View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text("POLYRHYTHM")
-                    .font(.system(size: 14, weight: .black, design: .monospaced))
+                    .font(.system(size: isWideLayout ? 18 : 14, weight: .black, design: .monospaced))
                     .foregroundColor(.white)
                     .tracking(4)
 
                 Text("\(viewModel.scale.rawValue) / \(viewModel.rootNoteName)")
-                    .font(.system(size: 10, design: .monospaced))
+                    .font(.system(size: isWideLayout ? 12 : 10, design: .monospaced))
                     .foregroundColor(.cyan.opacity(0.6))
             }
 
             Spacer()
 
-            // View mode switcher
-            HStack(spacing: 0) {
-                ForEach(ViewMode.allCases, id: \.rawValue) { mode in
-                    Button(action: { withAnimation(.easeInOut(duration: 0.2)) { viewMode = mode } }) {
-                        Text(mode.rawValue)
-                            .font(.system(size: 10, weight: viewMode == mode ? .bold : .regular, design: .monospaced))
-                            .foregroundColor(viewMode == mode ? .white : .gray)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(
-                                viewMode == mode ? Color.white.opacity(0.1) : Color.clear
-                            )
+            // View mode switcher (only shown on compact/iPhone where we stack)
+            if !isWideLayout {
+                HStack(spacing: 0) {
+                    ForEach(ViewMode.allCases, id: \.rawValue) { mode in
+                        Button(action: { withAnimation(.easeInOut(duration: 0.2)) { viewMode = mode } }) {
+                            Text(mode.rawValue)
+                                .font(.system(size: 10, weight: viewMode == mode ? .bold : .regular, design: .monospaced))
+                                .foregroundColor(viewMode == mode ? .white : .gray)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(
+                                    viewMode == mode ? Color.white.opacity(0.1) : Color.clear
+                                )
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
+                .background(Capsule().fill(Color.white.opacity(0.05)))
+                .clipShape(Capsule())
             }
-            .background(Capsule().fill(Color.white.opacity(0.05)))
-            .clipShape(Capsule())
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+        .padding(.horizontal, isWideLayout ? 24 : 16)
+        .padding(.vertical, isWideLayout ? 12 : 8)
         .background(Color.black.opacity(0.95))
     }
 
-    // MARK: - View Modes
+    // MARK: - Shared Subviews
 
-    private var visualizerOnly: some View {
+    private var visualizerView: some View {
         PolyrhythmVisualizerView(
             tracks: viewModel.tracks,
             currentSteps: viewModel.currentSteps,
@@ -97,30 +136,9 @@ struct ContentView: View {
         )
     }
 
-    private var trackListOnly: some View {
-        trackList
-    }
-
-    private var hybridView: some View {
-        VStack(spacing: 0) {
-            // Compact visualizer
-            PolyrhythmVisualizerView(
-                tracks: viewModel.tracks,
-                currentSteps: viewModel.currentSteps,
-                isPlaying: viewModel.isPlaying
-            )
-            .frame(height: 250)
-
-            Divider().background(Color.gray.opacity(0.2))
-
-            // Track list
-            trackList
-        }
-    }
-
     private var trackList: some View {
         ScrollView {
-            LazyVStack(spacing: 4) {
+            LazyVStack(spacing: isWideLayout ? 6 : 4) {
                 ForEach(Array(viewModel.tracks.enumerated()), id: \.element.id) { index, track in
                     TrackRowView(
                         track: track,
@@ -139,14 +157,13 @@ struct ContentView: View {
                     )
                 }
 
-                // Delete track buttons (swipe-like)
                 if let selectedIndex = viewModel.selectedTrackIndex, selectedIndex < viewModel.tracks.count {
                     Button(action: { viewModel.removeTrack(at: selectedIndex) }) {
                         HStack {
                             Image(systemName: "trash")
                             Text("Remove \(viewModel.tracks[selectedIndex].name)")
                         }
-                        .font(.system(size: 11, design: .monospaced))
+                        .font(.system(size: isWideLayout ? 13 : 11, design: .monospaced))
                         .foregroundColor(.red.opacity(0.7))
                         .padding(.vertical, 8)
                     }
@@ -154,6 +171,7 @@ struct ContentView: View {
                 }
             }
             .padding(.vertical, 8)
+            .padding(.horizontal, isWideLayout ? 8 : 0)
         }
     }
 }
