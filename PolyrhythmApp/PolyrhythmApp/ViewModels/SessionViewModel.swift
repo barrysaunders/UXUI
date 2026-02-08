@@ -174,35 +174,55 @@ final class SessionViewModel: ObservableObject {
         sequencer.setTracks(tracks, synths: synths)
     }
 
+    /// Push all track parameters (filter, ADSR, volume, pan) to their
+    /// corresponding Synthesizer objects and AudioEngine mixer nodes.
+    /// Must be called after any bulk edit (randomize, evolve, preset load).
+    private func syncAllTrackParameters() {
+        for track in tracks {
+            if let synth = synths[track.id] {
+                synth.voiceType = track.voiceType
+                synth.filterCutoff = track.filterCutoff
+                synth.filterResonance = track.filterResonance
+                synth.attack = track.attack
+                synth.decay = track.decay
+                synth.sustain = track.sustain
+                synth.release = track.release
+            }
+            audioEngine.updateTrackVolume(id: track.id, volume: track.isMuted ? 0.0 : track.volume)
+            audioEngine.updateTrackPan(id: track.id, pan: track.pan)
+        }
+        syncTracksToSequencer()
+    }
+
     // MARK: - Randomization
 
     func randomizeAll() {
         EvolutionEngine.randomizeAll(tracks: &tracks, scale: scale)
-        syncTracksToSequencer()
+        syncAllTrackParameters()
     }
 
     func randomizeTrack(at index: Int) {
         guard index < tracks.count else { return }
         EvolutionEngine.randomize(track: &tracks[index], scale: scale)
-        syncTracksToSequencer()
+        syncAllTrackParameters()
     }
 
     func smartRandomize() {
         for i in tracks.indices {
             EvolutionEngine.generateSmart(track: &tracks[i], scale: scale)
         }
-        syncTracksToSequencer()
+        syncAllTrackParameters()
     }
 
     func randomizeEverything() {
         EvolutionEngine.randomizeEverything(tracks: &tracks, scale: scale)
-        syncTracksToSequencer()
+        syncAllTrackParameters()
     }
 
     func euclideanize(trackIndex: Int, pulses: Int) {
         guard trackIndex < tracks.count else { return }
         EvolutionEngine.applyEuclidean(track: &tracks[trackIndex], pulses: pulses, scale: scale)
-        syncTracksToSequencer()
+        syncAllTrackParameters()
     }
 
     // MARK: - Evolution
@@ -232,7 +252,7 @@ final class SessionViewModel: ObservableObject {
 
     private func evolveStep() {
         EvolutionEngine.evolveAll(tracks: &tracks, scale: scale)
-        syncTracksToSequencer()
+        syncAllTrackParameters()
     }
 
     // MARK: - Presets
