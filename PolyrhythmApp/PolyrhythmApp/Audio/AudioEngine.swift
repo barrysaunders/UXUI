@@ -14,7 +14,7 @@ final class AudioEngine: ObservableObject {
 
     @Published var isRunning = false
     @Published var masterVolume: Float = 0.8 {
-        didSet { mainMixer.outputVolume = masterVolume }
+        didSet { updateTrackGainCompensation() }
     }
     @Published var reverbMix: Float = 0.3 {
         didSet { reverbNode.wetDryMix = reverbMix * 100 }
@@ -68,8 +68,6 @@ final class AudioEngine: ObservableObject {
         engine.connect(mainMixer, to: reverbNode, format: outputFormat)
         engine.connect(reverbNode, to: delayNode, format: outputFormat)
         engine.connect(delayNode, to: engine.mainMixerNode, format: outputFormat)
-
-        mainMixer.outputVolume = masterVolume
     }
 
     // MARK: - Track Management
@@ -116,6 +114,8 @@ final class AudioEngine: ObservableObject {
         let trackNode = TrackAudioNode(sourceNode: sourceNode, synth: synth, mixerNode: mixerNode)
         trackNodes[track.id] = trackNode
 
+        updateTrackGainCompensation()
+
         return synth
     }
 
@@ -125,6 +125,15 @@ final class AudioEngine: ObservableObject {
         engine.disconnectNodeOutput(node.mixerNode)
         engine.detach(node.sourceNode)
         engine.detach(node.mixerNode)
+        updateTrackGainCompensation()
+    }
+
+    /// Scale the main mixer volume down as more tracks are added to prevent summing distortion
+    private func updateTrackGainCompensation() {
+        let count = max(1, trackNodes.count)
+        // Gain compensation: reduce by ~3dB per doubling of tracks
+        let compensation = 1.0 / sqrt(Float(count))
+        mainMixer.outputVolume = masterVolume * compensation
     }
 
     func synthForTrack(id: UUID) -> Synthesizer? {
