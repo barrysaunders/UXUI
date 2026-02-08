@@ -14,8 +14,9 @@ final class Sequencer: ObservableObject {
     private var timer: DispatchSourceTimer?
     private let timerQueue = DispatchQueue(label: "com.polyrhythm.sequencer", qos: .userInteractive)
 
-    // Tracks and their synths
+    // Tracks and their synths - accessed from both main and timer threads
     private var trackSynths: [(track: Track, synth: Synthesizer)] = []
+    private let trackLock = NSLock()
 
     // Timing
     private var tickCount: Int = 0
@@ -37,13 +38,17 @@ final class Sequencer: ObservableObject {
     // MARK: - Configuration
 
     func setTracks(_ tracks: [Track], synths: [UUID: Synthesizer]) {
-        trackSynths = tracks.compactMap { track in
+        let newTrackSynths = tracks.compactMap { track -> (track: Track, synth: Synthesizer)? in
             guard let synth = synths[track.id] else { return nil }
             return (track, synth)
         }
+        trackLock.lock()
+        trackSynths = newTrackSynths
+        trackLock.unlock()
     }
 
     func updateTrack(_ track: Track) {
+        trackLock.lock()
         if let index = trackSynths.firstIndex(where: { $0.track.id == track.id }) {
             let synth = trackSynths[index].synth
             trackSynths[index] = (track, synth)
@@ -56,6 +61,7 @@ final class Sequencer: ObservableObject {
             synth.sustain = track.sustain
             synth.release = track.release
         }
+        trackLock.unlock()
     }
 
     private func recalculateTiming() {
@@ -74,9 +80,11 @@ final class Sequencer: ObservableObject {
         globalStep = 0
 
         // Reset all track positions
+        trackLock.lock()
         for i in trackSynths.indices {
             trackSynths[i].track.currentStep = 0
         }
+        trackLock.unlock()
 
         let timer = DispatchSource.makeTimerSource(queue: timerQueue)
         timer.schedule(deadline: .now(), repeating: tickInterval)
@@ -93,7 +101,10 @@ final class Sequencer: ObservableObject {
         timer = nil
 
         // Send note-offs
-        for (_, synth) in trackSynths {
+        trackLock.lock()
+        let currentTrackSynths = trackSynths
+        trackLock.unlock()
+        for (_, synth) in currentTrackSynths {
             synth.noteOff()
         }
     }
@@ -102,9 +113,11 @@ final class Sequencer: ObservableObject {
         stop()
         tickCount = 0
         globalStep = 0
+        trackLock.lock()
         for i in trackSynths.indices {
             trackSynths[i].track.currentStep = 0
         }
+        trackLock.unlock()
     }
 
     // MARK: - Tick
@@ -113,12 +126,17 @@ final class Sequencer: ObservableObject {
         let currentTick = tickCount
         tickCount += 1
 
+        // Snapshot the current tracks under lock
+        trackLock.lock()
+        let snapshot = trackSynths
+        trackLock.unlock()
+
         // Check if this tick aligns with a step for each track
-        for i in trackSynths.indices {
-            let track = trackSynths[i].track
+        for i in snapshot.indices {
+            let track = snapshot[i].track
             guard !track.isMuted else { continue }
 
-            let synth = trackSynths[i].synth
+            let synth = snapshot[i].synth
 
             // Each track has its own step division based on stepCount
             // The "cycle length" for this track in ticks

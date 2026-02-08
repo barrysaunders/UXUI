@@ -90,11 +90,13 @@ final class SessionViewModel: ObservableObject {
         addTrack(voiceType: .pad, steps: 3)
 
         // Generate smart patterns for all tracks
-        for i in tracks.indices {
-            EvolutionEngine.generateSmart(track: &tracks[i], scale: scale)
+        var updated = tracks
+        for i in updated.indices {
+            EvolutionEngine.generateSmart(track: &updated[i], scale: scale)
         }
+        tracks = updated
 
-        syncTracksToSequencer()
+        syncAllTrackParameters()
     }
 
     // MARK: - Track Management
@@ -197,31 +199,41 @@ final class SessionViewModel: ObservableObject {
     // MARK: - Randomization
 
     func randomizeAll() {
-        EvolutionEngine.randomizeAll(tracks: &tracks, scale: scale)
+        var updated = tracks
+        EvolutionEngine.randomizeAll(tracks: &updated, scale: scale)
+        tracks = updated
         syncAllTrackParameters()
     }
 
     func randomizeTrack(at index: Int) {
         guard index < tracks.count else { return }
-        EvolutionEngine.randomize(track: &tracks[index], scale: scale)
+        var updated = tracks
+        EvolutionEngine.randomize(track: &updated[index], scale: scale)
+        tracks = updated
         syncAllTrackParameters()
     }
 
     func smartRandomize() {
-        for i in tracks.indices {
-            EvolutionEngine.generateSmart(track: &tracks[i], scale: scale)
+        var updated = tracks
+        for i in updated.indices {
+            EvolutionEngine.generateSmart(track: &updated[i], scale: scale)
         }
+        tracks = updated
         syncAllTrackParameters()
     }
 
     func randomizeEverything() {
-        EvolutionEngine.randomizeEverything(tracks: &tracks, scale: scale)
+        var updated = tracks
+        EvolutionEngine.randomizeEverything(tracks: &updated, scale: scale)
+        tracks = updated
         syncAllTrackParameters()
     }
 
     func euclideanize(trackIndex: Int, pulses: Int) {
         guard trackIndex < tracks.count else { return }
-        EvolutionEngine.applyEuclidean(track: &tracks[trackIndex], pulses: pulses, scale: scale)
+        var updated = tracks
+        EvolutionEngine.applyEuclidean(track: &updated[trackIndex], pulses: pulses, scale: scale)
+        tracks = updated
         syncAllTrackParameters()
     }
 
@@ -251,7 +263,9 @@ final class SessionViewModel: ObservableObject {
     }
 
     private func evolveStep() {
-        EvolutionEngine.evolveAll(tracks: &tracks, scale: scale)
+        var updated = tracks
+        EvolutionEngine.evolveAll(tracks: &updated, scale: scale)
+        tracks = updated
         syncAllTrackParameters()
     }
 
