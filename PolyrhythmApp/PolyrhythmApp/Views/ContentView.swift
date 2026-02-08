@@ -37,6 +37,7 @@ struct ContentView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .focusedSceneValue(\.session, viewModel)
         .sheet(isPresented: $viewModel.showTrackEditor) {
             if let idx = viewModel.selectedTrackIndex {
                 TrackEditorView(viewModel: viewModel, trackIndex: idx)
