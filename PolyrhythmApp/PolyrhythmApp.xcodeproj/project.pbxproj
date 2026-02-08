@@ -21,7 +21,7 @@
 		A1000001000000000000000C /* TrackEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000C /* TrackEditorView.swift */; };
 		A1000001000000000000000D /* TransportBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000D /* TransportBarView.swift */; };
 		A1000001000000000000000E /* GlobalSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000E /* GlobalSettingsView.swift */; };
-		A1000001000000000000000F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000F; };
+		A1000001000000000000000F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A2000001000000000000000F /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -365,7 +365,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,6";
 			};
 			name = Debug;
 		};
@@ -393,7 +393,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,6";
 			};
 			name = Release;
 		};
