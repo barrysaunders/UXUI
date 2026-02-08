@@ -111,6 +111,9 @@ final class Synthesizer {
         // Apply envelope and velocity
         sample *= env * Double(currentVelocity)
 
+        // Soft-clip output to prevent harsh digital distortion
+        sample = tanh(sample)
+
         return sample
     }
 
@@ -131,7 +134,7 @@ final class Synthesizer {
         // Transient click
         let click = pitchEnv * pitchEnv * pitchEnv * sin(phase * .pi * 8.0) * 0.5
 
-        return tanh((body + sub + click) * 1.5)
+        return tanh((body + sub + click) * 0.9)
     }
 
     private func renderSnare(env: Double) -> Double {
@@ -150,7 +153,7 @@ final class Synthesizer {
         let noiseEnv = max(0.0, 1.0 - Double(envSamples) / (sampleRate * 0.12))
         let noise = noiseValue * noiseEnv
 
-        return tanh((tone * 0.6 + noise * 0.9) * 2.0)
+        return tanh((tone * 0.4 + noise * 0.6) * 1.2)
     }
 
     private func renderHiHat(env: Double) -> Double {
@@ -184,7 +187,7 @@ final class Synthesizer {
         phase2 += (freq * 0.5) / sampleRate
         let sub = sin(phase2 * .pi * 2.0) * 0.5
 
-        return tanh((mix + sub) * 1.3)
+        return tanh((mix + sub) * 0.8)
     }
 
     private func renderLead(env: Double) -> Double {
@@ -199,7 +202,7 @@ final class Synthesizer {
         let saw2 = 2.0 * (phase2.truncatingRemainder(dividingBy: 1.0)) - 1.0
         let saw3 = 2.0 * (phase3.truncatingRemainder(dividingBy: 1.0)) - 1.0
 
-        return (saw1 + saw2 + saw3) * 0.33
+        return (saw1 + saw2 + saw3) * 0.25
     }
 
     private func renderPad(env: Double) -> Double {
@@ -216,7 +219,7 @@ final class Synthesizer {
         // Fifth harmonic for shimmer
         let shimmer = sin(phase * .pi * 2.0 * 3.0) * 0.1
 
-        return (osc1 + osc2 + osc3) * 0.3 + shimmer
+        return (osc1 + osc2 + osc3) * 0.2 + shimmer
     }
 
     private func renderPerc(env: Double) -> Double {
@@ -229,7 +232,7 @@ final class Synthesizer {
         let modulator = sin(phase2 * .pi * 2.0) * modDepth
 
         phase += (freq + freq * modulator) / sampleRate
-        return sin(phase * .pi * 2.0) * 0.7
+        return sin(phase * .pi * 2.0) * 0.5
     }
 
     private func renderAcid(env: Double) -> Double {
@@ -240,7 +243,7 @@ final class Synthesizer {
 
         // Square sub
         let square = phase.truncatingRemainder(dividingBy: 1.0) < 0.5 ? 0.5 : -0.5
-        return saw * 0.7 + square * 0.3
+        return saw * 0.5 + square * 0.2
     }
 
     // MARK: - Filter (2-pole low-pass)
@@ -250,8 +253,8 @@ final class Synthesizer {
         let cutoffHz = 20.0 + pow(max(0.0, min(1.0, modCutoff)), 3.0) * 18000.0
         let resonance = Double(filterResonance)
 
-        let c = 2.0 * sin(.pi * cutoffHz / sampleRate)
-        let r = max(0.01, 1.0 - resonance * 0.98)
+        let c = 2.0 * sin(.pi * min(cutoffHz, sampleRate * 0.45) / sampleRate)
+        let r = max(0.15, 1.0 - resonance * 0.8)
 
         filterBuf0 += c * (input - filterBuf0 + r * (filterBuf0 - filterBuf1))
         filterBuf1 += c * (filterBuf0 - filterBuf1)

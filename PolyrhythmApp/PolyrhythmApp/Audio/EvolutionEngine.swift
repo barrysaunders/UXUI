@@ -12,9 +12,9 @@ struct EvolutionEngine {
 
         for i in track.steps.indices {
             track.steps[i].isActive = Float.random(in: 0...1) < density
-            track.steps[i].velocity = Float.random(in: 0.4...1.0)
+            track.steps[i].velocity = Float.random(in: 0.4...0.85)
             track.steps[i].note = Int.random(in: 0..<scale.intervals.count * 2)
-            track.steps[i].paramMod = Float.random(in: -0.5...0.5)
+            track.steps[i].paramMod = Float.random(in: -0.3...0.3)
         }
 
         // Ensure at least one step is active
@@ -248,7 +248,7 @@ struct EvolutionEngine {
             currentNote = max(0, min(noteRange, currentNote))
             track.steps[i].note = currentNote
             track.steps[i].velocity = Float.random(in: 0.5...1.0)
-            track.steps[i].paramMod = Float.random(in: -0.8...0.8)  // filter sweeps
+            track.steps[i].paramMod = Float.random(in: -0.4...0.4)  // filter sweeps
         }
     }
 
@@ -256,34 +256,35 @@ struct EvolutionEngine {
 
     /// Randomize synth parameters for a track
     static func randomizeParameters(track: inout Track) {
-        track.filterCutoff = Float.random(in: 0.2...0.9)
-        track.filterResonance = Float.random(in: 0.0...0.7)
+        track.filterCutoff = Float.random(in: 0.3...0.85)
+        track.filterResonance = Float.random(in: 0.0...0.45)
 
         switch track.voiceType {
         case .kick, .snare, .hihat, .perc:
             track.attack = Float.random(in: 0.0...0.05)
-            track.decay = Float.random(in: 0.1...0.5)
-            track.sustain = Float.random(in: 0.0...0.3)
-            track.release = Float.random(in: 0.05...0.3)
+            track.decay = Float.random(in: 0.1...0.4)
+            track.sustain = Float.random(in: 0.0...0.2)
+            track.release = Float.random(in: 0.05...0.25)
         case .bass, .acid:
-            track.attack = Float.random(in: 0.0...0.1)
-            track.decay = Float.random(in: 0.1...0.6)
-            track.sustain = Float.random(in: 0.2...0.7)
-            track.release = Float.random(in: 0.1...0.4)
-        case .lead:
-            track.attack = Float.random(in: 0.01...0.2)
+            track.attack = Float.random(in: 0.0...0.08)
             track.decay = Float.random(in: 0.1...0.5)
-            track.sustain = Float.random(in: 0.3...0.8)
-            track.release = Float.random(in: 0.1...0.5)
+            track.sustain = Float.random(in: 0.2...0.6)
+            track.release = Float.random(in: 0.1...0.3)
+        case .lead:
+            track.attack = Float.random(in: 0.01...0.15)
+            track.decay = Float.random(in: 0.1...0.4)
+            track.sustain = Float.random(in: 0.3...0.7)
+            track.release = Float.random(in: 0.1...0.4)
         case .pad:
-            track.attack = Float.random(in: 0.2...0.8)
-            track.decay = Float.random(in: 0.3...0.8)
-            track.sustain = Float.random(in: 0.5...1.0)
-            track.release = Float.random(in: 0.3...0.8)
+            track.attack = Float.random(in: 0.2...0.6)
+            track.decay = Float.random(in: 0.3...0.7)
+            track.sustain = Float.random(in: 0.4...0.8)
+            track.release = Float.random(in: 0.3...0.6)
         }
 
-        track.reverbSend = Float.random(in: 0.0...0.6)
-        track.delaySend = Float.random(in: 0.0...0.5)
+        track.reverbSend = Float.random(in: 0.0...0.4)
+        track.delaySend = Float.random(in: 0.0...0.35)
+        track.volume = Float.random(in: 0.5...0.8)
     }
 
     /// Completely randomize everything
